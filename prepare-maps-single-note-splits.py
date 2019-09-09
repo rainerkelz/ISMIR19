@@ -3,6 +3,7 @@ import fnmatch
 import argparse
 import re
 from collections import defaultdict
+import utils
 
 
 synthnames = set([
@@ -65,15 +66,15 @@ def main():
 
     filenames = collect_all_filenames(synthnames)
 
-    print('filenames', filenames)
-
     os.chdir(current_directory)
+    out_dir = 'splits/maps-isolated-notes'
+    utils.ensure_directory_exists(out_dir)
     for synthname, volumes in filenames.items():
         for volume, fns in volumes.items():
-            with open('splits/maps-isolated-notes/{}_{}'.format(synthname, volume), 'w') as f:
+            with open(os.path.join(out_dir, '{}_{}'.format(synthname, volume)), 'w') as f:
                 write_to_file(f, fns)
 
-    with open('splits/maps-isolated-notes/instruments', 'w') as f:
+    with open(os.path.join(out_dir, 'instruments'), 'w') as f:
         for si, synthname in enumerate(sorted(synthnames)):
             f.write('{},{}\n'.format(synthname, si))
 

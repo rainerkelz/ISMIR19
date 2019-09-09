@@ -1,6 +1,7 @@
 import os
 import fnmatch
 import argparse
+import utils
 
 
 test_synthnames = set([
@@ -54,7 +55,7 @@ def collect_all_filenames(synthnames, include):
 
 
 def write_to_file(f, filenames_synthnames):
-    for filename, synthname in filenames_synthnames:
+    for filename, synthname in sorted(filenames_synthnames):
         audiofilename = filename + '.flac'
         midifilename = filename + '.mid'
         instrument = synthname
@@ -95,16 +96,20 @@ def main():
     print('len(test_filenames)', len(test_filenames))
 
     os.chdir(current_directory)
-    with open('splits/maps-non-overlapping/train', 'w') as f:
+
+    out_dir = 'splits/maps-non-overlapping'
+    utils.ensure_directory_exists(out_dir)
+
+    with open(os.path.join(out_dir, 'train'), 'w') as f:
         write_to_file(f, train_filenames)
 
-    with open('splits/maps-non-overlapping/valid', 'w') as f:
+    with open(os.path.join(out_dir, 'valid'), 'w') as f:
         write_to_file(f, valid_filenames)
 
-    with open('splits/maps-non-overlapping/test', 'w') as f:
+    with open(os.path.join(out_dir, 'test'), 'w') as f:
         write_to_file(f, test_filenames)
 
-    with open('splits/maps-non-overlapping/instruments', 'w') as f:
+    with open(os.path.join(out_dir, 'instruments'), 'w') as f:
         all_synthnames = train_synthnames | test_synthnames
         for si, synthname in enumerate(sorted(all_synthnames)):
             f.write('{},{}\n'.format(synthname, si))

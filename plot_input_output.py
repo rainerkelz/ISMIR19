@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-# DIVERGING_CMAP = 'coolwarm'
+
 DIVERGING_CMAP = 'RdBu_r'
 
 

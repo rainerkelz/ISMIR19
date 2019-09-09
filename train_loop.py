@@ -127,14 +127,6 @@ def train(logger,
 
         loss.backward()
 
-        # grads = []
-        # for p in model.parameters():
-        #     grads.append(p.grad.data.cpu().numpy().flatten())
-        # grads = np.hstack(grads)
-        # print('grads.min()', grads.min())
-        # print('grads.mean()', grads.mean())
-        # print('grads.max()', grads.max())
-
         # GRADIENT CLIPPING!
         for p in model.parameters():
             p.grad.data.clamp_(-gradient_clip, gradient_clip)

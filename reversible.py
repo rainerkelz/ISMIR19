@@ -38,32 +38,22 @@ class InvBlock(nn.Module):
         self.t1 = transform(w)
         self.s2 = transform(w)
         self.t2 = transform(w)
-        # self.actnorm = ActNorm(width)
 
-        # TODO: find out if this will be saved, when the model parameters are saved?
-        # would be problematic, if otherwise ...
         self.register_buffer('permutation', permutation_matrix(width))
         self.clamp = clamp
 
-    # def e(self, s):
-    #     # very, *very* important!
-    #     return torch.exp(self.clamp * 0.636 * torch.atan(s))
     def e(self, s):
-        # # very, *very* important!
+        # very, *very* important to clamp here!!
         return torch.exp(self.clamp * 0.636 * torch.atan(s))
-        # return torch.exp(s)
 
     def mix(self, m):
         # quite a bit weirder with the random perm ...
         return m.mm(self.permutation)
-        # return m
 
     def unmix(self, m):
         return m.mm(self.permutation.t())
-        # return m
 
     def encode(self, u):
-        # u = self.actnorm.encode(u)
         u = self.mix(u)
         u1, u2 = split(u)
 
@@ -80,7 +70,6 @@ class InvBlock(nn.Module):
         u = merge(u1, u2)
         u = self.unmix(u)
         return u
-        # return self.actnorm.decode(u)
 
 
 class InvBlockChain(nn.Module):
@@ -111,58 +100,6 @@ class InvBlockChain(nn.Module):
                     init.kaiming_uniform_(module.weight, init.calculate_gain('relu'))
                     if module.bias is not None:
                         init.constant_(module.bias, 0.)
-
-
-# ActNorm Layer with data-dependant init
-class ActNorm(nn.Module):
-    def __init__(self, num_features, logscale_factor=1., scale=1.):
-        super(ActNorm, self).__init__()
-        self.initialized = False
-        self.logscale_factor = logscale_factor
-        self.scale = scale
-        self.register_parameter('b', nn.Parameter(torch.zeros(1, num_features, 1)))
-        self.register_parameter('logs', nn.Parameter(torch.zeros(1, num_features, 1)))
-
-    def encode(self, x):
-        input_shape = x.size()
-        x = x.view(input_shape[0], input_shape[1], -1)
-        # import matplotlib.pyplot as plt
-        # fig, ax = plt.subplots()
-        # ax.hist(x.detach().cpu().numpy().flatten(), histtype='step', label='x')
-        if not self.initialized:
-            self.initialized = True
-            unsqueeze = lambda x: x.unsqueeze(0).unsqueeze(-1).detach()
-
-            # Compute the mean and variance
-            sum_size = x.size(0) * x.size(-1)
-            input_sum = x.sum(dim=0).sum(dim=-1)
-            b = input_sum / sum_size * -1.
-            vars = ((x - unsqueeze(b)) ** 2).sum(dim=0).sum(dim=1) / sum_size
-            vars = unsqueeze(vars)
-            logs = torch.log(self.scale / torch.sqrt(vars) + 1e-6) / self.logscale_factor
-
-            self.b.data.copy_(unsqueeze(b).data)
-            self.logs.data.copy_(logs.data)
-
-        logs = self.logs * self.logscale_factor
-        b = self.b
-
-        output = (x + b) * torch.exp(logs)
-
-        # ax.hist(output.detach().cpu().numpy().flatten(), histtype='step', label='normed')
-        # ax.legend().draggable()
-        # plt.show()
-        return output.view(input_shape)
-
-    def decode(self, x):
-        assert self.initialized
-        input_shape = x.size()
-        x = x.view(input_shape[0], input_shape[1], -1)
-        logs = self.logs * self.logscale_factor
-        b = self.b
-        output = x * torch.exp(-logs) - b
-
-        return output.view(input_shape)
 
 
 # a thin convenience wrapper around the actual pytorch model
@@ -210,11 +147,9 @@ class ReversibleModel(nn.Module):
         )
 
     def train(self, _train=True):
-        # print('model in train mode')
         super().train(_train)
 
     def eval(self):
-        # print('model in eval mode')
         super().eval()
 
         # IMPORTANT: these need to be reset to zero!

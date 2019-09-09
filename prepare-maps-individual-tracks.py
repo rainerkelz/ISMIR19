@@ -1,6 +1,7 @@
 import os
 import fnmatch
 import argparse
+import utils
 
 
 test_synthnames = set([
@@ -64,11 +65,6 @@ def write_to_files(base_directory, filenames_synthnames):
             f.write('{},{},{}\n'.format(audiofilename, midifilename, instrument))
 
 
-def ensure_exists(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-
 def main():
     parser = argparse.ArgumentParser('prepare maps splits (+instruments)')
     parser.add_argument('base_dir', help='path to the maps_piano/data folder')
@@ -108,9 +104,9 @@ def main():
     valid_dir = 'splits/maps-individual-tracks/valid'
     test_dir = 'splits/maps-individual-tracks/test'
 
-    ensure_exists(train_dir)
-    ensure_exists(valid_dir)
-    ensure_exists(test_dir)
+    utils.ensure_directory_exists(train_dir)
+    utils.ensure_directory_exists(valid_dir)
+    utils.ensure_directory_exists(test_dir)
 
     write_to_files(train_dir, train_filenames)
     write_to_files(valid_dir, valid_filenames)

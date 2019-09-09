@@ -69,7 +69,7 @@ class MMD(Distance):
                       torch.zeros(xx.shape).to(self.device),
                       torch.zeros(xx.shape).to(self.device))
 
-        # these need to be pulled out of a hat
+        # these scales need to be pulled out of a hat...
         for a in self.scales:
             XX += a**2 * (a**2 + dxx)**-1
             YY += a**2 * (a**2 + dyy)**-1
