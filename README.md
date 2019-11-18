@@ -108,3 +108,78 @@ $ python plot_maps_spec2labels_single_notes_good_bad.py runs/maps_spec2labels_sw
 ## Demo GUI (to edit latent codes and have direct feedback)
 
 - the demo GUI ended up in a different [repository](https://github.com/rainerkelz/ISMIR19-GUI).
+
+## Training the key-wise RNNs
+
+- prerequisites: a trained invertible model (the GUI repo contains a pre-trained model, if you want to skip the training step)
+- we need to export the latent codes that the model produces from the data
+```
+$ mkdir exports
+$ python export_maps_spec2labels.py runs/<run-name>/model_state_final.pkl exports/<run-name>
+```
+
+- train the key-wise RNNs
+```
+$ python train_rnn_gru.py exports/<run-name>
+$ python train_rnn_lstm.py exports/<run-name>
+$ python train_rnn_gru_larger.py exports/<run-name>
+```
+
+- test the key-wise RNNs
+```
+$ python test_rnn_gru.py runs/rnn_gru_maps_spec2labels_swd/model_state_best.pkl exports/<run-name>
+$ python test_rnn_lstm.py runs/rnn_lstm_maps_spec2labels_swd/model_state_best.pkl exports/<run-name>
+$ python test_rnn_gru_larger.py runs/rnn_gru_larger_maps_spec2labels_swd/model_state_best.pkl exports/<run-name>
+```
+- if you use the pretrained model in this [repository](https://github.com/rainerkelz/ISMIR19-GUI) for exporting, and let the different RNNs train for a while (~a day or two), they should achieve approximately these results:
+
+Type  | F-measure (framewise)
+-------------------------------
+GRU   | 0.7137
+LSTM  | 0.7125
+biGRU | 0.7393
+
+- this makes them about as useful as a CNN with 5 frames of context, for piano transcription
+
+## FAQ
+
+### Question
+> You included "note phase" in the output features,
+> and defined it in the range of [0,5]. But it doesn't look like
+> to be a "real" phase, but something more like note loudness?
+
+### Answer
+Yes, "note phase" means phase in the following sense: "a distinct period or stage in a series of events or a process of change or development" and describes the current temporal evolution of the note. It is **not** supposed to describe overall loudness. That is what the velocity outputs are there for.
+
+- "velocity" corresponds roughly to loudness
+- "note phase" corresponds roughly to positional encoding of the temporal evolution of the spectrum
+
+
+### Question
+> Is there any special considerations why you decided to define a
+> different range for the "note phase" rather than [0,1]?
+
+### Answer
+Yes, it is a last minute hack to get a more useful error signal... one could do this in any number of other ways though.
+
+
+### Question
+> It looks you are designing the model in a multitask manner, have
+> you tried other simpler output encodings (something more close to the
+> baselines in your experiment)?
+
+### Answer
+That is definitely possible, but there are some caveats. We're assuming you mean
+something along the lines of "map a spectrogram frame to a binary indicator vector",
+ignoring all temporal aspects of notes.
+
+This would definitely "work", but the results of using the model in the
+generative direction would be very different. Assume you are setting
+some note to "1" in the latent space and then generate. This would then
+yield an **arbitrary** sample of a spectrogram frame corresponding to the
+note. You could not specify that you wanted an onset frame or somewhere
+in the middle anymore!
+
+One could certainly fix that, by using recurrent invertible models for example.
+These are relatively easy to write down on paper, yet surprisingly difficult
+to tame practically. (At least we found them to be that way ...)
