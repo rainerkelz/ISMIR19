@@ -100,16 +100,11 @@ $ python plot_maps_spec2labels_single_notes_figure.py runs/<run-name>/model_stat
 $ python plot_maps_spec2labels_single_notes_good_bad.py runs/maps_spec2labels_swd/model_state_final.pkl  plots/single_notes
 ```
 
-## Training RNNs on the latent codes from a trained INN model
-
-- the RNN training code is in the process of being cleaned up, and will be released shortly (most likely after the ISMIR conference)
-
-
 ## Demo GUI (to edit latent codes and have direct feedback)
 
 - the demo GUI ended up in a different [repository](https://github.com/rainerkelz/ISMIR19-GUI).
 
-## Training the key-wise RNNs
+## Training the key-wise RNNs on the latent codes from a trained INN model
 
 - prerequisites: a trained invertible model (the GUI repo contains a pre-trained model, if you want to skip the training step)
 - we need to export the latent codes that the model produces from the data
