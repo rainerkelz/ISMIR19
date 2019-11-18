@@ -129,7 +129,7 @@ $ python test_rnn_gru_larger.py runs/rnn_gru_larger_maps_spec2labels_swd/model_s
 - if you use the pretrained model in this [repository](https://github.com/rainerkelz/ISMIR19-GUI) for exporting, and let the different RNNs train for a while (~a day or two), they should achieve approximately these results:
 
 Type  | F-measure (framewise)
--------------------------------
+------|------------------------
 GRU   | 0.7137
 LSTM  | 0.7125
 biGRU | 0.7393
