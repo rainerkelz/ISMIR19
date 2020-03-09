@@ -139,7 +139,9 @@ biGRU | 0.7393
 ## Reproduction Efforts
 - several QMUL students made an effort to reproduce the reported results, and also did some additional experiments.
 - you can find their work here (please look at the different branches):
+
   https://github.com/penestia/ISMIR19
+
   https://github.com/cheriell/ISMIR19
 
 ## FAQ
