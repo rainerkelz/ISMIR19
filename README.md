@@ -136,6 +136,12 @@ biGRU | 0.7393
 
 - this makes them about as useful as a CNN with 5 frames of context, for piano transcription
 
+## Reproduction Efforts
+- several QMUL students made an effort to reproduce the reported results, and also did some additional experiments.
+- you can find their work here (please look at the different branches):
+  https://github.com/penestia/ISMIR19
+  https://github.com/cheriell/ISMIR19
+
 ## FAQ
 
 ### Question
