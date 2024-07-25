@@ -1,4 +1,4 @@
-torch==1.0.1
+torch==2.2.0
 joblib>=0.13.0
 tensorboardX==1.4
 scikit-learn>=0.19.1
